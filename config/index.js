@@ -1,8 +1,8 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 var path = require('path')
 // var baseUrl = 'http://test1.iot.v/';
-var baseUrl = 'http://192.168.0.232/';
-// var baseUrl = `http://192.168.0.33:9999/`
+// var baseUrl = 'http://192.168.0.232/';
+var baseUrl = `http://192.168.0.33:9999/`
 module.exports = {
   build: {
     env: require('./prod.env'),
@@ -37,6 +37,13 @@ module.exports = {
         changeOrigin: true,
         pathRewrite: {
           '^/auth': '/auth'
+        }
+      },
+      '/tenant': {
+        target: baseUrl,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/tenant': '/tenant'
         }
       },
       '/admin': {

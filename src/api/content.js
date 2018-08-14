@@ -2,7 +2,7 @@ import request from '@/router/axios'
 /* 标签列表 */
 export function fetchTagList(query) {
   return request({
-    url: '/admin/article/tag/list',
+    url: '/tenant/article/tag/list',
     method: 'get',
     params: query
   })
@@ -11,7 +11,7 @@ export function fetchTagList(query) {
 /* 分类列表 */
 export function fetchCategoryList(query) {
   return request({
-    url: '/admin/article/category/list',
+    url: '/tenant/article/category/list',
     method: 'get',
     params: query
   })
@@ -19,7 +19,7 @@ export function fetchCategoryList(query) {
 
 export function fetchList(query) {
   return request({
-    url: '/admin/article/list',
+    url: '/tenant/article/list',
     method: 'get',
     params: query
   })
@@ -37,7 +37,7 @@ export function upload(query) {
   /* 删除 */
 export function delObj(id) {
     return request({
-      url: '/admin/article/delete?id=' + id,
+      url: '/tenant/article/delete?id=' + id,
       method: 'post'
     })
   }
@@ -45,7 +45,7 @@ export function delObj(id) {
   /* 新增 */
 export function addObj(obj) {
     return request({
-      url: '/admin/article/add',
+      url: '/tenant/article/add',
       method: 'post',
       data: obj
     })
@@ -54,7 +54,7 @@ export function addObj(obj) {
   /* 编辑 */
 export function updataObj(obj) {
     return request({
-      url: '/admin/article/update',
+      url: '/tenant/article/update',
       method: 'post',
       data: obj
     })
@@ -63,7 +63,7 @@ export function updataObj(obj) {
   /* 详情 */
 export function getObj(id) {
     return request({
-      url: '/admin/article/get?id='+id,
+      url: '/tenant/article/get?id='+id,
       method: 'get',
     })
   }

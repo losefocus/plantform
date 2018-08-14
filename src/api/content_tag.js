@@ -2,7 +2,7 @@ import request from '@/router/axios'
 
 export function fetchList(query) {
   return request({
-    url: '/admin/article/tag/list',
+    url: '/tenant/article/tag/list',
     method: 'get',
     params: query
   })
@@ -11,7 +11,7 @@ export function fetchList(query) {
   /* 删除 */
 export function delObj(id) {
     return request({
-      url: '/admin/article/tag/delete?id=' + id,
+      url: '/tenant/article/tag/delete?id=' + id,
       method: 'post'
     })
   }
@@ -19,7 +19,7 @@ export function delObj(id) {
   /* 新增 */
 export function addObj(obj) {
     return request({
-      url: '/admin/article/tag/add',
+      url: '/tenant/article/tag/add',
       method: 'post',
       data: obj
     })
@@ -28,7 +28,7 @@ export function addObj(obj) {
   /* 编辑 */
 export function editObj(obj) {
     return request({
-      url: '/admin/article/tag/edit',
+      url: '/tenant/article/tag/edit',
       method: 'post',
       data: obj
     })

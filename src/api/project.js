@@ -12,7 +12,7 @@ export function fetchList(query) {
   /* 管理员列表 */
   export function fetchAdminList() {
     return request({
-      url: '/admin/user/list',
+      url: '/tenant/user/list',
       method: 'get',
       
     })

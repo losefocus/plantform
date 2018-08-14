@@ -2,7 +2,7 @@ import request from '@/router/axios'
 
 export function fetchList(query) {
   return request({
-    url: '/admin/log/list',
+    url: '/tenant/log/list',
     method: 'get',
     params: query
   })
@@ -10,14 +10,14 @@ export function fetchList(query) {
 
 export function delObj(id) {
   return request({
-    url: '/admin/log/delete?id=' + id,
+    url: '/tenant/log/delete?id=' + id,
     method: 'post'
   })
 }
 
 export function addObj(obj) {
   return request({
-    url: '/admin/user/',
+    url: '/tenant/user/',
     method: 'post',
     data: obj
   })
@@ -25,14 +25,14 @@ export function addObj(obj) {
 
 export function getObj(id) {
   return request({
-    url: '/admin/user/' + id,
+    url: '/tenant/user/' + id,
     method: 'get'
   })
 }
 
 export function putObj(obj) {
   return request({
-    url: '/admin/user/',
+    url: '/tenant/user/',
     method: 'put',
     data: obj
   })

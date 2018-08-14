@@ -2,7 +2,7 @@ import request from '@/router/axios'
 
 export function fetchList(query) {
   return request({
-    url: '/admin/dict/list',
+    url: '/tenant/dict/list',
     method: 'get',
     params: query
   })
@@ -10,7 +10,7 @@ export function fetchList(query) {
 
 export function addObj(obj) {
   return request({
-    url: '/admin/dict/add',
+    url: '/tenant/dict/add',
     method: 'post',
     data: obj
   })
@@ -18,21 +18,21 @@ export function addObj(obj) {
 
 export function getObj(id) {
   return request({
-    url: '/admin/dict/get?id=' + id,
+    url: '/tenant/dict/get?id=' + id,
     method: 'get'
   })
 }
 
 export function delObj(row) {
   return request({
-    url: '/admin/dict/delete?id=' + row.id + '&type=' + row.type,
+    url: '/tenant/dict/delete?id=' + row.id + '&type=' + row.type,
     method: 'post'
   })
 }
 
 export function putObj(obj) {
   return request({
-    url: '/admin/dict/edit/',
+    url: '/tenant/dict/edit/',
     method: 'post',
     data: obj
   })
@@ -40,7 +40,7 @@ export function putObj(obj) {
 
 export function remote(type) {
   return request({
-    url: '/admin/dict/type?type=' + type,
+    url: '/tenant/dict/type?type=' + type,
     method: 'get'
   })
 }

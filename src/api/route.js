@@ -2,7 +2,7 @@ import request from '@/router/axios'
 
 export function fetchList(query) {
   return request({
-    url: '/admin/route/list',
+    url: '/tenant/route/list',
     method: 'get',
     params: query
   })
@@ -10,7 +10,7 @@ export function fetchList(query) {
 
 export function addObj(obj) {
   return request({
-    url: '/admin/route/add',
+    url: '/tenant/route/add',
     method: 'post',
     data: obj
   })
@@ -18,21 +18,21 @@ export function addObj(obj) {
 
 export function getObj(id) {
   return request({
-    url: '/admin/route/get?id=' + id,
+    url: '/tenant/route/get?id=' + id,
     method: 'get'
   })
 }
 
 export function delObj(id) {
   return request({
-    url: '/admin/route/delete?id=' + id,
+    url: '/tenant/route/delete?id=' + id,
     method: 'post'
   })
 }
 
 export function putObj(obj) {
   return request({
-    url: '/admin/route/edit',
+    url: '/tenant/route/edit',
     method: 'post',
     data: obj
   })
@@ -40,7 +40,7 @@ export function putObj(obj) {
 
 export function applyObj() {
   return request({
-    url: '/admin/route/apply',
+    url: '/tenant/route/apply',
     method: 'get'
   })
 }

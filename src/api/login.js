@@ -6,7 +6,7 @@ export const loginByUsername = (username, password, code, randomStr) => {
   var grant_type = 'password'
   var scope = 'server'
   return request({
-    url:'/admin/user/login',
+    url:'/tenant/user/login',
     method: 'post',
     params: { username, password, randomStr, code }  //,grant_type , scope
   })
@@ -27,7 +27,7 @@ export function mobileLogin(mobile, code) {
 
 export const getUserInfo = (username) => {
   return request({
-    url: '/admin/user/info',
+    url: '/tenant/user/info',
     // headers: {
     //   'Authorization': 'Basic cGlnOnBpZw=='
     // },
@@ -38,7 +38,7 @@ export const getUserInfo = (username) => {
 
 export const logout = (accesstoken, refreshToken) => {
   return request({
-    url: '/admin/user/logout',
+    url: '/tenant/user/logout',
     method: 'post',
     params: { accesstoken, refreshToken }
   })
