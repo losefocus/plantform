@@ -125,7 +125,7 @@
           method: undefined,
           path: undefined
         },
-        currentId: -1,
+        currentId: 0,
         menuManager_btn_add: false,
         menuManager_btn_edit: false,
         menuManager_btn_del: false
@@ -160,7 +160,7 @@
       },
       filterNode(value, data) {
         if (!value) return true
-        return data.label.indexOf(value) !== -1
+        return data.label.indexOf(value) !== 0
       },
 
       nodeExpand(data) {

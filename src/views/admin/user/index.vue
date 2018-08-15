@@ -28,15 +28,9 @@
         </template>
       </el-table-column>
 
-      <!-- <el-table-column align="center" label="所属部门" show-overflow-tooltip>
+       <el-table-column align="center" label="所属部门" show-overflow-tooltip>
         <template slot-scope="scope">
           <span>{{scope.row.deptName}} </span>
-        </template>
-      </el-table-column> -->
-
-      <el-table-column align="center" label="所属分组" show-overflow-tooltip>
-        <template slot-scope="scope">
-          <span>{{scope.row.groupName}} </span>
         </template>
       </el-table-column>
 
@@ -92,15 +86,9 @@
           <el-input type="password" v-model="form.password"></el-input>
         </el-form-item>
 
-        <!-- <el-form-item label="所属部门" prop="deptName">
+         <el-form-item label="所属部门" prop="deptName">
           <el-input v-model="form.deptName" placeholder="选择部门" @focus="handleDept()" readonly></el-input>
           <input type="hidden" v-model="form.deptId" />
-        </el-form-item> -->
-
-        <el-form-item label="所属分组">
-          <!-- <el-input v-model="form.groupName" placeholder="选择分组" @focus="handleDept()" readonly></el-input> -->
-          <!-- <input type="hidden" v-model="form.group" /> -->
-          <el-cascader :options="groupOptions" v-model="groupIds" :show-all-levels="false" change-on-select @change="changeGroup"></el-cascader>
         </el-form-item>
 
         <el-form-item label="角色" prop="role">
@@ -134,7 +122,6 @@
 <script>
 import { fetchList, getObj, addObj, putObj, delObj,get_parent } from "@/api/user";
 import { roleList, fetchDeptTree } from "@/api/role";
-import { fetchTree } from "@/api/group";
 import { treeAddValue } from "@/util/util";
 import waves from "@/directive/waves/index.js"; // 水波纹指令
 // import { parseTime } from '@/utils'
@@ -145,20 +132,12 @@ import ElOption from "element-ui/packages/select/src/option";
 export default {
   components: {
     ElOption,
-    ElRadioGroup
   },
   name: "table_user",
   directives: {
     waves
   },
   data() {
-    var validateGroup = (rule, value, callback) => {
-        if (this.groupIds.length == 0) {
-            callback(new Error('请选择分组'));
-        } else {
-            callback();
-        }
-    };
     return {
       treeDeptData: [],
       checkedKeys: [],
@@ -175,15 +154,12 @@ export default {
       },
       role: [],
       roleName:[],
-      groupIds:[],
       form: {
         name:undefined,
         username: undefined,
         password: undefined,
         c: true,
         mobile: undefined,
-        group:undefined,
-        groupName:undefined,
       },
       rules: {
         username: [
@@ -212,9 +188,6 @@ export default {
             trigger: "blur"
           }
         ],
-        groupIds: [
-           { validator: validateGroup, message: '请选择分组', trigger: 'change' ,required: false,}
-        ],
         role: [
           {
             required: true,
@@ -238,7 +211,6 @@ export default {
       },
       statusOptions: ["0", "1"],
       rolesOptions: [],
-      groupOptions: [],
       dialogFormVisible: false,
       dialogDeptVisible: false,
       userAdd: false,
@@ -253,7 +225,10 @@ export default {
         0: false,
         1: true
       },
-      tableKey: 0
+      tableKey: 0,
+      sys_user_add: false,
+      sys_user_upd: false,
+      sys_user_del: false
     };
   },
   computed: {
@@ -273,6 +248,9 @@ export default {
     this.getList();
     this.handleDept();
     this.getRoleList()
+
+  },
+  mounted(){
     this.sys_user_add = this.permissions["sys_user_add"];
     this.sys_user_upd = this.permissions["sys_user_upd"];
     this.sys_user_del = this.permissions["sys_user_del"];
@@ -287,17 +265,6 @@ export default {
         this.total = response.data.result.total;
         this.listLoading = false;
       });
-    },
-    // getNodeData(data) {
-    //   this.dialogDeptVisible = false;
-    //   this.form.group = data.id;
-    //   this.form.groupName = data.name;
-    //   roleList().then(response => {
-    //     this.rolesOptions = response.data.result;
-    //   });
-    // },
-    changeGroup(){
-      this.form.group = this.groupIds[this.groupIds.length - 1]
     },
     handleDept() {
       fetchTree().then(response => {
@@ -332,7 +299,6 @@ export default {
       getObj(row.id).then(response => {
         this.form = response.data.result;
         this.form.status = this.form.status == 1?true:false
-        this.form.groupName = row.groupName
         this.dialogFormVisible = true;
         this.dialogStatus = "update";
         this.role = [];
@@ -341,14 +307,6 @@ export default {
           this.role[i] = row.roleList[i].roleId ;
           this.roleName[i] = row.roleList[i].roleName;
         }
-        
-        get_parent(this.form.group).then(res => {
-          let groups = new Array
-          res.data.result.forEach(ele => {
-            groups.push(ele.id)
-          });
-          this.groupIds = groups
-        })
       });
     },
     create(formName) {

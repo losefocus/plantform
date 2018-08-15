@@ -22,7 +22,7 @@ let msg
 axios.interceptors.request.use(config => {
   NProgress.start() // start progress bar
   if (store.getters.access_token) {
-    config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带token--['X-Token']为自定义key 请根据实际情况自行修改
+    config.headers['token'] = getToken() // 让每个请求携带token--['X-Token']为自定义key 请根据实际情况自行修改
   }
   return config
 }, error => {
@@ -62,7 +62,7 @@ axios.interceptors.response.use(data => {
     //   location.reload(); // 为了重新实例化vue-router对象 避免bug
     // })
   }
-  
+
   return Promise.reject(new Error(error))
 })
 

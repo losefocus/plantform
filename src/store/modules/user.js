@@ -57,10 +57,10 @@ const user = {
       return new Promise((resolve, reject) => {
         loginByUsername(userInfo.username, userInfo.password, userInfo.code, userInfo.randomStr).then(response => {
           const data = response.data.result
-          setToken(data.access_token)
+          setToken(data.token)
           commit('SET_USER_NAME', userInfo.username)
-          commit('SET_ACCESS_TOKEN', data.access_token)
-          commit('SET_REFRESH_TOKEN', data.refresh_token)
+          commit('SET_ACCESS_TOKEN', data.token)
+          // commit('SET_REFRESH_TOKEN', data.refresh_token)
           commit('CLEAR_LOCK')
           resolve()
         }).catch(error => {

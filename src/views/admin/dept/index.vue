@@ -80,7 +80,7 @@
           name: undefined,
           orderNum: undefined,
           parentId: undefined,
-          deptId: undefined
+          id: undefined
         },
         currentId: 0,
         deptManager_btn_add: false,
@@ -109,6 +109,11 @@
         'permissions'
       ])
     },
+    mounted(){
+      this.deptManager_btn_add = this.permissions['sys_dept_add']
+      this.deptManager_btn_edit = this.permissions['sys_dept_edit']
+      this.deptManager_btn_del = this.permissions['sys_dept_del']
+    },
     methods: {
       getList() {
         fetchTree(this.listQuery).then(response => {
@@ -130,7 +135,7 @@
         this.showElement = true
       },
       handlerEdit() {
-        if (this.form.deptId) {
+        if (this.form.id) {
           this.formEdit = false
           this.formStatus = 'update'
         }
