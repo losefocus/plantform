@@ -2,7 +2,7 @@
 var path = require('path')
 // var baseUrl = 'http://test1.iot.v/';
 // var baseUrl = 'http://192.168.0.232/';
-var baseUrl = `http://localhost:9999/`
+var baseUrl = `http://192.168.0.33:9999/`
 module.exports = {
   build: {
     env: require('./prod.env'),
@@ -25,7 +25,7 @@ module.exports = {
   },
   dev: {
     env: require('./dev.env'),
-    port: 9991,
+    port: 9992,
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     host: '0.0.0.0',

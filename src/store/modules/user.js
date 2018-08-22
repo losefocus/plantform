@@ -110,8 +110,9 @@ const user = {
         getUserInfo(state.userName).then(response => {
           const data = response.data.result
           commit('SET_ROLES', data.roles)
-          commit('SET_USER_INFO', data.sysUser)
+          commit('SET_USER_INFO', data)
           commit('SET_PERMISSIONS', data.permissions)
+          console.log(data)
           resolve(response)
         }).catch(error => {
           reject(error)

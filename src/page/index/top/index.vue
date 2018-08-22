@@ -61,7 +61,9 @@ export default {
     return {};
   },
   filters: {},
-  created() {this.initCollapse()},
+  created() {
+    this.initCollapse()
+  },
   mounted() {
     listenfullscreen(this.setScreen);
     window.onresize = () =>{
