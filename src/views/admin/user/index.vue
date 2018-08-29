@@ -153,9 +153,9 @@ export default {
         page_size: 20
       },
       role: [],
-      roleName:[],
+      roleName: [],
       form: {
-        name:undefined,
+        name: undefined,
         username: undefined,
         password: undefined,
         c: true,
@@ -246,8 +246,9 @@ export default {
   },
   created() {
     this.getList();
-    this.handleDept();
     this.getRoleList()
+    this.handleDept();
+
 
   },
   mounted(){
@@ -268,6 +269,7 @@ export default {
     },
     handleDept() {
       fetchTree().then(response => {
+        console.log(response)
         this.treeDeptData = response.data.result;
         this.groupOptions = treeAddValue(response.data.result)
         this.dialogDeptVisible = true;
@@ -290,10 +292,11 @@ export default {
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
     },
-    getRoleList(){
+    getRoleList() {
+      console.log(12312)
       roleList().then(response => {
-          this.rolesOptions = response.data.result;
-        });
+        this.rolesOptions = response.data.result;
+      });
     },
     handleUpdate(row) {
       getObj(row.id).then(response => {

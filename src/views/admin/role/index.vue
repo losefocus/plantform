@@ -288,21 +288,23 @@ export default {
         });
       })
 
-      
+
     },
     create(formName) {
       const set = this.$refs;
       set[formName].validate(valid => {
         if (valid) {
-          addObj(this.form).then(() => {
+          addObj(this.form).then(res => {
             this.dialogFormVisible = false;
             this.getList();
-            this.$notify({
-              title: "成功",
-              message: "创建成功",
-              type: "success",
-              duration: 2000
-            });
+            if(res.success){
+              this.$notify({
+                title: "成功",
+                message: "创建成功",
+                type: "success",
+                duration: 2000
+              });
+            }
           });
         } else {
           return false;

@@ -8,32 +8,24 @@ export function fetchList(query) {
   })
 }
 
-export function delObj(id) {
+export function delIndex() {
   return request({
-    url: '/tenant/log/delete?id=' + id,
-    method: 'post'
+    url: '/tenant/log/delete_index',
+    method: 'get'
   })
 }
 
-export function addObj(obj) {
+export function createIndex() {
   return request({
-    url: '/tenant/user/',
-    method: 'post',
-    data: obj
+    url: '/tenant/log/create_index',
+    method: 'get'
   })
 }
 
 export function getObj(id) {
   return request({
-    url: '/tenant/user/' + id,
+    url: '/tenant/log/' + id,
     method: 'get'
   })
 }
 
-export function putObj(obj) {
-  return request({
-    url: '/tenant/user/',
-    method: 'put',
-    data: obj
-  })
-}

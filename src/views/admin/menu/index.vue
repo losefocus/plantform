@@ -247,6 +247,7 @@
             type: 'success',
             duration: 2000
           })
+          this.formEdit = true
         })
       },
       create() {
@@ -258,6 +259,7 @@
             type: 'success',
             duration: 2000
           })
+          this.formEdit = true
         })
       },
       onCancel() {

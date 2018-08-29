@@ -2,32 +2,27 @@
   <div class="app-container calendar-list-container">
     <div class="filter-container clearfix">
       <div class="pull-right">
-        <el-select style="width: 200px;" class="filter-item" v-model="listQuery.type" filterable placeholder="请选择" size="small">
-          <el-option v-for="item in dicts" :key="item.value" :label="item.label" :value="item.value">
-          </el-option>
-        </el-select>
+        <el-input class="filter-item" v-model="listQuery.requestUri" size="small" style="width:150px"/>
         <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter" size="small">搜索</el-button>
+        <el-button class="filter-item" type="primary" v-waves icon="search" @click="createIndex" size="small" v-if="log_btn_create">创建索引</el-button>
+        <el-button class="filter-item" type="primary" v-waves icon="search" @click="deleteIndex" size="small" v-if="sys_log_del">删除索引</el-button>
       </div>
     </div>
     <el-table :key='tableKey' :data="list" v-loading="listLoading" fit highlight-current-row style="width: 100%">
-      <el-table-column align="center" label="序号">
+      <el-table-column label="服务ID" show-overflow-tooltip>
         <template slot-scope="scope">
-          <span>{{ getSerialNumber(scope.$index) }}</span>
+          <span>{{ scope.row.serviceId }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column align="center" label="类型">
-        <template slot-scope="scope">
-          <span>
-            <el-button type="success" size="mini" v-if="scope.row.type == 0">{{ scope.row.type | typeFilter }}</el-button>
-            <el-button type="danger" size="mini" v-if="scope.row.type ==9">{{ scope.row.type | typeFilter }}</el-button>
-          </span>
-        </template>
-      </el-table-column>
-
       <el-table-column label="请求接口" show-overflow-tooltip>
         <template slot-scope="scope">
           <span>{{ scope.row.requestUri }}</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column align="center" label="请求时间">
+        <template slot-scope="scope">
+          <span>{{ scope.row.createNow}}</span>
         </template>
       </el-table-column>
 
@@ -49,24 +44,17 @@
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="请求时间">
+      <el-table-column align="center" label="请求耗时(ms)">
         <template slot-scope="scope">
           <span>{{ scope.row.time}}</span>
         </template>
       </el-table-column>
-
-      <el-table-column align="center" label="创建时间">
+      <el-table-column align="center" label="异常" show-overflow-tooltip>
         <template slot-scope="scope">
-          <span>{{ scope.row.createTime | moment('YYYY-MM-DD HH:mm') }}</span>
+            <span>{{ scope.row.exception}}</span>
         </template>
       </el-table-column>
 
-      <el-table-column align="center" label="操作">
-        <template slot-scope="scope">
-          <el-button size="mini" type="" v-if="sys_log_del" @click="handleDelete(scope.row)">删除
-          </el-button>
-        </template>
-      </el-table-column>
     </el-table>
     <div v-show="!listLoading" class="pagination-container">
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="listQuery.page_index" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" layout="total, prev, pager, next, jumper" :total="total">
@@ -76,7 +64,7 @@
 </template>
 
 <script>
-import { delObj, fetchList } from "@/api/log";
+import { createIndex, delIndex, fetchList } from "@/api/log";
 import { remote } from "@/api/dict";
 import waves from "@/directive/waves/index.js"; // 水波纹指令
 import { mapGetters } from "vuex";
@@ -92,41 +80,51 @@ export default {
       total: null,
       sys_dict_add: false,
       listLoading: true,
-      dicts: [],
       listQuery: {
         page_index: 1,
         page_size: 20,
-        type: undefined
+        requestUri: undefined
       },
-      tableKey: 0
-    };
+      tableKey: 0,
+      log_btn_create:false,
+      sys_log_del:false,
+    }
   },
   computed: {
     ...mapGetters(["permissions"])
   },
   filters: {
-    typeFilter(type) {
-      const typeMap = {
-        0: "正常",
-        9: "异常"
-      };
-      return typeMap[type];
-    }
   },
   created() {
-    this.getList();
+    this.getList()
+    this.log_btn_create = this.permissions["log_btn_create"];
     this.sys_log_del = this.permissions["sys_log_del"];
-    remote("log_type").then(response => {
-      this.dicts = response.data.result;
-    });
+
   },
   methods: {
-    getSerialNumber(index) {
-      return index + 1 + (this.listQuery.page_index - 1) * this.listQuery.page_size;
+    createIndex(){
+      createIndex().then(response => {
+        this.$notify({
+          title: "成功",
+          message: "创建成功",
+          type: "success",
+          duration: 2000
+        });
+      })
+    },
+    deleteIndex(){
+      delIndex().then(response => {
+        this.$notify({
+          title: "成功",
+          message: "删除成功",
+          type: "success",
+          duration: 2000
+        });
+      })
     },
     getList() {
       this.listLoading = true;
-      this.listQuery.sort_by = "create_time";
+      this.listQuery.sort_by = "createTime";
       this.listQuery.direction = false;
       fetchList(this.listQuery).then(response => {
         this.list = response.data.result.items;
@@ -141,18 +139,6 @@ export default {
     handleCurrentChange(val) {
       this.listQuery.page_index = val;
       this.getList();
-    },
-    handleDelete(row) {
-      delObj(row.id).then(response => {
-        this.dialogFormVisible = false;
-        this.getList();
-        this.$notify({
-          title: "成功",
-          message: "删除成功",
-          type: "success",
-          duration: 2000
-        });
-      });
     },
     handleFilter() {
       this.listQuery.page_index = 1;

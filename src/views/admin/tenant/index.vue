@@ -5,8 +5,8 @@
                  size="small">添加
       </el-button>
       <div class="pull-right">
-        <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="用户名"
-                  v-model="listQuery.username" size="small">
+        <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item" placeholder="租户名称"
+                  v-model="listQuery.name" size="small">
         </el-input>
         <el-button class="filter-item" type="primary" v-waves icon="search" @click="handleFilter" size="small">搜索
         </el-button>
@@ -14,9 +14,19 @@
     </div>
 
     <el-table :key='tableKey' :data="list" v-loading="listLoading" fit highlight-current-row style="width: 100%">
-      <el-table-column align="center" label="名称">
+      <el-table-column align="center" label="租户名称">
         <template slot-scope="scope">
           <span>{{scope.row.name}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="域名">
+        <template slot-scope="scope">
+          <span>{{scope.row.domain}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="code" show-overflow-tooltip>
+        <template slot-scope="scope">
+          <span>{{scope.row.code}}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="电话">
@@ -24,7 +34,6 @@
           <span>{{scope.row.tel}}</span>
         </template>
       </el-table-column>
-
       <el-table-column align="center" label="联系方式" show-overflow-tooltip>
         <template slot-scope="scope">
           <span>{{scope.row.contact}} </span>
@@ -54,14 +63,6 @@
           <i v-else class="el-icon-circle-close" style="font-size:18px;color:#909399"></i>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" width="200">
-        <template slot-scope="scope">
-          <el-button v-if="sys_tenant_upd" size="mini" type="" @click="handleUpdate(scope.row)">编辑
-          </el-button>
-          <el-button v-if="sys_tenant_del" size="mini" type="" @click="deletes(scope.row)" style="margin-left:0">删除
-          </el-button>
-        </template>
-      </el-table-column>
     </el-table>
 
     <div v-show="!listLoading" class="pagination-container">
@@ -74,12 +75,14 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form :model="form" :rules="rules" ref="form" label-width="100px">
         <el-form-item label="用户名" prop="name">
-          <el-input v-model="form.name" placeholder="请输用户名"></el-input>
+          <el-input v-model="form.name" placeholder="请输入用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="域名" prop="name">
+          <el-input v-model="form.domain" placeholder="请输入域名"></el-input>
         </el-form-item>
         <el-form-item label="电话" prop="tel">
           <el-input v-model="form.tel" placeholder="请输入电话"></el-input>
         </el-form-item>
-
         <el-form-item label="地址" prop="position">
           <el-input v-model="form.position" placeholder="请输入地址"></el-input>
         </el-form-item>
@@ -130,9 +133,12 @@
         },
         form: {
           name: undefined,
+          domain: undefined,
           tel: undefined,
           position: undefined,
-          comment: undefined
+          comment: undefined,
+          contact: undefined,
+          code: undefined
         },
         rules: {
           name: [
@@ -148,9 +154,16 @@
               trigger: "blur"
             }
           ],
+          domain: [
+            {
+              required: true,
+              message: "请输入域名",
+              trigger: "blur"
+            }
+          ],
           tel: [
             {
-              required: false,
+              required: true,
               message: "手机号",
               trigger: "blur"
             },
@@ -246,7 +259,7 @@
         const set = this.$refs;
         set[formName].validate(valid => {
           if (valid) {
-            delete this.form.status
+            delete this.form.status;
             addObj(this.form).then(() => {
               this.dialogFormVisible = false;
               this.getList();
@@ -266,73 +279,16 @@
         this.dialogFormVisible = false;
         this.$refs[formName].resetFields();
       },
-      update(formName) {
-        const set = this.$refs;
-        set[formName].validate(valid => {
-          if (valid) {
-            this.dialogFormVisible = false;
-            this.form.status = this.form.status ? 1 : 0
-            putObj(this.form).then(() => {
-              this.dialogFormVisible = false;
-              this.getList();
-              this.$notify({
-                title: "成功",
-                message: "修改成功",
-                type: "success",
-                duration: 2000
-              });
-            });
-          } else {
-            return false;
-          }
-        });
-      },
-      deletes(row) {
-        this.$confirm(
-          "此操作将永久删除该用户(用户名:" + row.username + "), 是否继续?",
-          "提示",
-          {
-            confirmButtonText: "确定",
-            cancelButtonText: "取消",
-            type: "warning"
-          }
-        ).then(() => {
-          delObj(row.id)
-            .then((res) => {
-              if (res.data.success == false) {
-                this.$notify({
-                  title: "失败",
-                  message: res.data.message,
-                  type: "error",
-                  duration: 2000
-                });
-              } else {
-                this.getList();
-                this.$notify({
-                  title: "成功",
-                  message: "删除成功",
-                  type: "success",
-                  duration: 2000
-                });
-              }
-            })
-          // .cache(() => {
-          //   this.$notify({
-          //     title: "失败",
-          //     message: "删除失败",
-          //     type: "error",
-          //     duration: 2000
-          //   });
-          // });
-        });
-      },
       resetTemp() {
         this.form = {
           id: undefined,
+          domain: "",
           name: "",
           tel: "",
-          position: true,
-          comment: ""
+          position: "",
+          comment: "",
+          contact: "",
+          code: ""
         };
       }
     }

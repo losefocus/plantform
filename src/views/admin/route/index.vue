@@ -156,7 +156,11 @@ export default {
           }
         ]
       },
-      form: {},
+      form: {
+        stripPrefix:'1',
+        retryable:'1',
+        enabled:'1'
+      },
       dialogFormVisible: false,
       dialogStatus: "",
       sys_route_add: false,
@@ -261,6 +265,11 @@ export default {
       this.dialogFormVisible = false;
       const set = this.$refs;
       set[formName].resetFields();
+      this.form = {
+        stripPrefix:'1',
+        retryable:'1',
+        enabled:'1'
+      }
     },
     update(formName) {
       const set = this.$refs;
