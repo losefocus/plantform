@@ -19,10 +19,12 @@ maven-build:
 #    - cnpm run build
 #    - npm run dev
     # 启动
-    - docker build -t="civillan-background-web" .
-    - ssh test@192.168.0.232 -tt docker stop civillan-background-web
-    - ssh test@192.168.0.232 -tt docker rm civillan-background-web
-    - ssh test@192.168.0.232 -tt docker run -p 9991:9991 --name civillan-background-web -d civillan-background-web
+    - npm config set registry https://registry.npm.taobao.org && npm install
+    - npm run build
+    - docker build -t="civillan-platform-web" .
+    #- ssh test@192.168.0.232 -tt docker stop civillan-platform-web
+    #- ssh test@192.168.0.232 -tt docker rm civillan-platform-web
+    - ssh test@192.168.0.232 -tt docker run -p 9991:80 -v /var/data/civillan-platform-web/default.conf:/etc/nginx/conf.d/default.conf --name civillan-platform-web -d civillan-platform-web
 
     #清除临时文件
     - ssh test@192.168.0.232 -tt docker rm $(docker ps -q -f status=exited -f name=runner)
