@@ -107,6 +107,34 @@ export default {
     waves
   },
   data() {
+    var validateValue = (rule, value, callback) => {
+      if (value === '' || value== undefined) {
+        callback(new Error('请输入数据值'));
+      } else {
+        callback();
+      }
+    };
+    var validateLabel = (rule, value, callback) => {
+      if (value === '' || value== undefined) {
+        callback(new Error('请输入标签名'));
+      } else {
+        callback();
+      }
+    };
+    var validateType = (rule, value, callback) => {
+      if (value === '' || value== undefined) {
+        callback(new Error('请输入类型'));
+      } else {
+        callback();
+      }
+    };
+    var validateRemarks = (rule, value, callback) => {
+      if (value === '' || value== undefined) {
+        callback(new Error('请输入备注信息'));
+      } else {
+        callback();
+      }
+    };
     return {
       list: null,
       total: null,
@@ -115,7 +143,12 @@ export default {
         page_index: 1,
         page_size: 20
       },
-      rules: {},
+      rules: {
+        value:[{ validator: validateValue, message: '请输入数据值', trigger: 'blur' }],
+        label:[{ validator: validateLabel, message: '请输入标签名', trigger: 'blur' }],
+        type:[{ validator: validateType, message: '请输入类型', trigger: 'blur' }],
+        remarks:[{ validator: validateRemarks, message: '请输入备注信息', trigger: 'blur' }]
+      },
       form: {},
       dialogFormVisible: false,
       dialogStatus: "",
