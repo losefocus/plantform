@@ -49,9 +49,12 @@
           <span>{{ scope.row.time}}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="异常" show-overflow-tooltip>
+      <el-table-column align="center" label="异常">
         <template slot-scope="scope">
-            <span>{{ scope.row.exception}}</span>
+          <el-tooltip :content="scope.row.exception" placement="top-end">
+            <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ scope.row.exception}}</span>
+          </el-tooltip>
+          
         </template>
       </el-table-column>
 

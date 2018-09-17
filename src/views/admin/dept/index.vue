@@ -29,7 +29,7 @@
               <el-input v-model="form.parentId" :disabled="formEdit" placeholder="请输入父级节点"></el-input>
             </el-form-item>
             <el-form-item label="节点编号" prop="parentId" >
-              <el-input v-model="form.id" :disabled="formEdit" placeholder="节点编号"></el-input>
+              <el-input v-model="form.id" :disabled="formEdit || formStatus=='update'" placeholder="节点编号"></el-input>
             </el-form-item>
             <el-form-item label="部门名称" prop="name">
               <el-input v-model="form.name" :disabled="formEdit"  placeholder="请输入名称"></el-input>

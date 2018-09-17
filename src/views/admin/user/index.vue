@@ -87,8 +87,14 @@
         </el-form-item>
 
          <el-form-item label="所属部门" prop="deptName">
-          <el-input v-model="form.deptName" placeholder="选择部门" @focus="handleDept()" readonly></el-input>
-          <input type="hidden" v-model="form.deptId" />
+          <!-- <el-input v-model="form.deptName" placeholder="选择部门" readonly></el-input> -->
+          <!-- <input type="hidden" v-model="form.deptId" /> -->
+          <el-cascader
+            change-on-select
+            :options="deptOptions"
+            v-model="deptId"
+            @change="changeDept">
+          </el-cascader>
         </el-form-item>
 
         <el-form-item label="角色" prop="role">
@@ -120,7 +126,7 @@
 </template>
 
 <script>
-import { fetchList, getObj, addObj, putObj, delObj,get_parent } from "@/api/user";
+import { fetchList, getObj, addObj, putObj, delObj,get_parent,fetchDeptList} from "@/api/user";
 import { roleList, fetchDeptTree } from "@/api/role";
 import { treeAddValue } from "@/util/util";
 import waves from "@/directive/waves/index.js"; // 水波纹指令
@@ -160,7 +166,9 @@ export default {
         password: undefined,
         c: true,
         mobile: undefined,
+        deptId:''
       },
+      deptId:[],
       rules: {
         username: [
           {
@@ -209,6 +217,7 @@ export default {
           }
         ]
       },
+      deptOptions:[],
       statusOptions: ["0", "1"],
       rolesOptions: [],
       dialogFormVisible: false,
@@ -247,8 +256,7 @@ export default {
   created() {
     this.getList();
     this.getRoleList()
-    this.handleDept();
-
+    this.getDeptList()
 
   },
   mounted(){
@@ -257,6 +265,18 @@ export default {
     this.sys_user_del = this.permissions["sys_user_del"];
   },
   methods: {
+    getParentId(arr,node){
+      
+    },
+    getDeptList(){
+      fetchDeptList().then(res => {
+        this.deptOptions = treeAddValue(res.data.result)
+      })
+      this.deptOptions
+    },
+    changeDept(){
+      this.form.deptId = this.deptId[this.deptId.length - 1]
+    },
     getList() {
       this.listLoading = true;
       this.listQuery.sort_by = "`user`.created_at";
@@ -265,14 +285,6 @@ export default {
         this.list = response.data.result.items;
         this.total = response.data.result.total;
         this.listLoading = false;
-      });
-    },
-    handleDept() {
-      fetchTree().then(response => {
-        console.log(response)
-        this.treeDeptData = response.data.result;
-        this.groupOptions = treeAddValue(response.data.result)
-        this.dialogDeptVisible = true;
       });
     },
     handleFilter() {
@@ -293,14 +305,16 @@ export default {
       this.dialogFormVisible = true;
     },
     getRoleList() {
-      console.log(12312)
       roleList().then(response => {
         this.rolesOptions = response.data.result;
       });
     },
     handleUpdate(row) {
+      console.log(row)
       getObj(row.id).then(response => {
         this.form = response.data.result;
+        this.deptId = [this.form.deptId]
+        console.log(this.deptId )
         this.form.status = this.form.status == 1?true:false
         this.dialogFormVisible = true;
         this.dialogStatus = "update";

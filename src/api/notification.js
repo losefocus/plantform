@@ -3,7 +3,7 @@ import request from '@/router/axios'
 /* 产品列表 */
 export function fetchList(query) {
     return request({
-      url: '/notification/list',
+      url: '/tenant/message/list',
       method: 'get',
       params: query
     })
@@ -13,7 +13,7 @@ export function fetchList(query) {
 /* 新增 */
 export function pushObj(obj) {
   return request({
-    url: '/notification/push_message',
+    url: '/tenant/message/add',
     method: 'post',
     params: obj
   })
@@ -28,10 +28,9 @@ export function delObj(id) {
 }
 
 /* 人员列表 */
-export function fetchUserList(obj) {
+export function getAllTenant() {
   return request({
-    url: '/project/project_user/list',
+    url: '/tenant/message/get_all_tenant',
     method: 'get',
-    params: obj
   })
 }

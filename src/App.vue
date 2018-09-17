@@ -89,4 +89,8 @@ export default {
 #help .el-collapse-item__header{
   background-color: #fbfbfb!important
 }
+
+.el-tooltip__popper{
+  max-width: 500px;
+}
 </style>

@@ -144,10 +144,10 @@ export default {
         page_size: 20
       },
       rules: {
-        value:[{ validator: validateValue, message: '请输入数据值', trigger: 'blur' }],
-        label:[{ validator: validateLabel, message: '请输入标签名', trigger: 'blur' }],
-        type:[{ validator: validateType, message: '请输入类型', trigger: 'blur' }],
-        remarks:[{ validator: validateRemarks, message: '请输入备注信息', trigger: 'blur' }]
+        value:[{ validator: validateValue, message: '请输入数据值', trigger: 'blur',required: true, }],
+        label:[{ validator: validateLabel, message: '请输入标签名', trigger: 'blur',required: true, }],
+        type:[{ validator: validateType, message: '请输入类型', trigger: 'blur',required: true, }],
+        remarks:[{ validator: validateRemarks, message: '请输入备注信息', trigger: 'blur',required: true,}]
       },
       form: {},
       dialogFormVisible: false,

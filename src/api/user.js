@@ -39,10 +39,19 @@ export function putObj(obj) {
   })
 }
 
-/* 修改 */
+/*  */
 export function get_parent(id) {
   return request({
     url: '/tenant/user/get_parent?id='+id,
     method: 'get',
+  })
+}
+
+/*部门列表*/
+export function fetchDeptList(query) {
+  return request({
+    url: '/tenant/dept/list',
+    method: 'get',
+    params: query
   })
 }

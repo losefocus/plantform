@@ -24,7 +24,7 @@
           <span>{{scope.row.domain}}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="code" show-overflow-tooltip>
+      <el-table-column align="center" label="code" show-overflow-tooltip enterable>
         <template slot-scope="scope">
           <span>{{scope.row.code}}</span>
         </template>
