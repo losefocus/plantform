@@ -26,7 +26,7 @@
               <el-input v-model="ruleForm2.mobile" placeholder="验证码登录使用"></el-input>
             </el-form-item>
             <el-form-item label="头像">
-              <my-upload field="uploadFile" @crop-upload-success="cropUploadSuccess" v-model="show" :width="300" :height="300" url="/file/attachment/upload" :headers="headers" img-format="png" :params="params"></my-upload>
+              <my-upload field="uploadFile" @crop-upload-success="cropUploadSuccess" v-model="show" :width="300" :height="300" url="/tenant/user/upload" :headers="headers" img-format="png" :params="params"></my-upload>
               <img v-if="ruleForm2.avatarBaseUrl!=''" :src="ruleForm2.avatarBaseUrl+ruleForm2.avatarPath" style="width:200px;height:200px;">
               <img v-else style="width:200px;height:200px" src="../../../assets/img/no_photo.png">
               <el-button type="primary" @click="toggleShow" size="mini">选择
@@ -121,7 +121,7 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           request({
-            url: "/admin/user/editInfo",
+            url: "/tenant/user/editInfo",
             method: "put",
             data: this.ruleForm2
           })
