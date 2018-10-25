@@ -18,7 +18,7 @@
           <span>{{scope.row.code}}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="sort">
+      <el-table-column align="center" label="排序">
         <template slot-scope="scope">
           <span>{{scope.row.sort}}</span>
         </template>
@@ -30,7 +30,7 @@
       </el-table-column>
       <el-table-column align="center" label="操作" width="250">
         <template slot-scope="scope">
-          <el-button v-if="product_category_params" size="mini" type="" @click="handleUpdate(scope.row)">分类参数</el-button>
+          <el-button v-if="product_category_params" size="mini" type="" @click="handleCategory(scope.row)">分类参数</el-button>
           <el-button v-if="product_category_edit" size="mini" type="" @click="handleUpdate(scope.row)">编辑</el-button>
           <el-button v-if="product_category_del" size="mini" type="" @click="deletes(scope.row)" style="margin-left:0">删除
           </el-button>
@@ -81,6 +81,9 @@
         <el-button v-else type="primary" @click="update('form')" size="small">修 改</el-button>
       </div>
     </el-dialog>
+    <el-dialog title="分类参数" :visible.sync="categoryVisible">
+      <category_params v-if="categoryVisible" :data-info="categoryData"></category_params>
+    </el-dialog>
   </div>
 </template>
 
@@ -93,10 +96,12 @@
   import {mapGetters} from "vuex";
   import ElRadioGroup from "element-ui/packages/radio/src/radio-group";
   import ElOption from "element-ui/packages/select/src/option";
+  import category_params from "./category_params";
 
   export default {
     components: {
       ElOption,
+      category_params
     },
     name: "table_user",
     directives: {
@@ -144,8 +149,10 @@
             }
           ]
         },
+        categoryData:{},
         statusOptions: ["0", "1"],
         rolesOptions: [],
+        categoryVisible:false,
         dialogFormVisible: false,
         dialogDeptVisible: false,
         userAdd: false,
@@ -191,6 +198,10 @@
       this.product_category_params = this.permissions["product_category_params"];
     },
     methods: {
+      handleCategory(row){
+        this.categoryData = row
+        this.categoryVisible = true
+      },
       beforeUpload(){
         this.uploadLoaing = true
       },
