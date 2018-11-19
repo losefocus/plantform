@@ -73,7 +73,7 @@ export default {
         this.$message.error("手机号格式不正确");
       } else {
         request({
-          url: "/admin/smsCode/" + this.loginForm.mobile,
+          url: "/tenant/smsCode/" + this.loginForm.mobile,
           method: "get"
         }).then(response => {
           if (response.data.data) {

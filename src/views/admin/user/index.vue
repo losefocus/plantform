@@ -196,6 +196,13 @@ export default {
             trigger: "blur"
           }
         ],
+        deptName:[
+          {
+            required: true,
+            message: "请选择部门",
+            trigger: "blur"
+          }
+        ],
         role: [
           {
             required: true,
@@ -205,7 +212,7 @@ export default {
         ],
         mobile: [
           {
-            required: false,
+            required: true,
             message: "手机号",
             trigger: "blur"
           },
