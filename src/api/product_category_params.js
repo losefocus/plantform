@@ -1,41 +1,37 @@
 import request from '@/router/axios'
 
-/* 分类列表 */
+
+/* 产品列表 */
 export function fetchList(query) {
     return request({
-      url: '/tenant/init_product_category/list',
+      url: '/tenant/init_product_category_params/list',
       method: 'get',
       params: query
     })
   }
+
+
 /* 新增 */
 export function addObj(obj) {
   return request({
-    url: '/tenant/init_product_category/add',
+    url: '/tenant/init_product_category_params/add',
     method: 'post',
     data: obj
-  })
-}
-/* 详情 */
-export function getObj(id) {
-  return request({
-    url: '/tenant/init_product_category/get?id=' + id,
-    method: 'get'
   })
 }
 
 /* 删除 */
 export function delObj(id) {
   return request({
-    url: '/tenant/init_product_category/delete?id=' + id,
+    url: '/tenant/init_product_category_params/delete?id=' + id,
     method: 'post'
   })
 }
 
 /* 编辑 */
-export function editObj(obj) {
+export function updateObj(obj) {
   return request({
-    url: '/tenant/init_product_category/edit',
+    url: '/tenant/init_product_category_params/edit',
     method: 'post',
     data: obj
   })

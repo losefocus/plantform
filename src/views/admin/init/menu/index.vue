@@ -29,10 +29,23 @@
         <el-card class="box-card">
           <el-form :label-position="labelPosition" label-width="80px" :model="form" ref="form">
             <el-form-item label="父级节点" prop="parentId">
-              <el-input v-model="form.parentId" :disabled="formEdit" placeholder="请输入父级节点"></el-input>
+              <!--<el-input v-model="form.parentId" :disabled="formEdit" placeholder="请输入父级节点"></el-input>-->
+              <el-cascader
+                :options="treeData"
+                :props="props"
+                change-on-select
+                v-model="selectedOptions"
+                @change="handleChange">
+              </el-cascader>
+            </el-form-item>
+            <el-form-item label="父级code" prop="parentId">
+              <el-input v-model="form.parentCode" disabled ></el-input>
             </el-form-item>
             <el-form-item label="节点ID" prop="parentId">
               <el-input v-model="form.id" disabled placeholder="请输入节点ID"></el-input>
+            </el-form-item>
+            <el-form-item label="节点code" prop="parentId">
+              <el-input v-model="form.code" disabled ></el-input>
             </el-form-item>
             <el-form-item label="标题" prop="name">
               <el-input v-model="form.name" :disabled="formEdit"  placeholder="请输入标题"></el-input>
@@ -81,12 +94,21 @@
 </template>
 
 <script>
-  import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/menu'
+  import { fetchTree, getObj, addObj, delObj, putObj } from '@/api/init/menu'
   import { mapGetters } from 'vuex'
   export default {
     name: 'menu',
     data() {
       return {
+        vals:[],
+        val: [],
+        codeMap:null,
+        parentOptions:[],
+        props:{
+          value:'id',
+          label:'name',
+        },
+        selectedOptions:[],
         list: null,
         total: null,
         formEdit: true,
@@ -136,15 +158,15 @@
         const typeMap = {
           0: '菜单',
           1: '按钮'
-        }
+        };
         return typeMap[type]
       }
     },
     created() {
-      this.getList()
-      this.menuManager_btn_add = this.permissions['sys_menu_add']
-      this.menuManager_btn_edit = this.permissions['sys_menu_edit']
-      this.menuManager_btn_del = this.permissions['sys_menu_del']
+      this.getList();
+      this.menuManager_btn_add = this.permissions['init_menu_add'];
+      this.menuManager_btn_edit = this.permissions['init_menu_upd'];
+      this.menuManager_btn_del = this.permissions['init_menu_del'];
     },
     computed: {
       ...mapGetters([
@@ -153,18 +175,38 @@
       ])
     },
     methods: {
+      //获取选中的完整对象
+      getCascaderObj(val,opt) {
+        return val.map(function (value, index, array) {
+          for (var itm of opt) {
+            if (itm.id == value) {
+              opt = itm.children;
+              return itm;
+            }
+          }
+          return null;
+        });
+      },
+
+      handleChange(){
+        this.form.parentId = this.selectedOptions[this.selectedOptions.length-1]
+        this.vals=this.getCascaderObj(this.selectedOptions, this.treeData);
+        this.form.parentCode = this.vals[this.selectedOptions.length-1].code
+        console.log(this.form.parentCode)
+      },
       getList() {
+        this.codeMap = new Map()
         fetchTree(this.listQuery).then(response => {
-          this.treeData = response.data.result
+          this.treeData = response.data.result;
         })
       },
       filterNode(value, data) {
-        if (!value) return true
+        if (!value) return true;
         return data.label.indexOf(value) !== 0
       },
 
       nodeExpand(data) {
-          let aChildren = data.children
+          let aChildren = data.children;
           if (aChildren.length > 0) {
             this.oExpandedKey[data.id] = true
             this.oTreeNodeChildren[data.id] = aChildren
@@ -172,7 +214,7 @@
           this.setExpandedKeys()
       },
       nodeCollapse(data) {
-        this.oExpandedKey[data.id] = false
+        this.oExpandedKey[data.id] = false;
         // 如果有子节点
         this.treeRecursion(this.oTreeNodeChildren[data.id], (oNode) => {
           this.oExpandedKey[oNode.id] = false
@@ -180,8 +222,8 @@
         this.setExpandedKeys()
       },
       setExpandedKeys() {
-        let oTemp = this.oExpandedKey
-        this.aExpandedKeys = []
+        let oTemp = this.oExpandedKey;
+        this.aExpandedKeys = [];
         for (let sKey in oTemp) {
           if (oTemp[sKey]) {
             this.aExpandedKeys.push(parseInt(sKey));
@@ -204,19 +246,21 @@
         }
         getObj(data.id).then(response => {
           this.form = response.data.result;
-        })
-        this.currentId = data.id
+          this.form.parentCode = this.form.parentCode || 0;
+          console.log(this.form)
+        });
+        this.currentId = data.id;
         this.showElement = true
       },
       handlerEdit() {
         if (this.form.id) {
-          this.formEdit = false
-          this.formStatus = 'update'
+          this.formEdit = false;
+          this.formStatus = 'update';
         }
       },
       handlerAdd() {
-        this.resetForm()
-        this.formEdit = false
+        this.resetForm();
+        this.formEdit = false;
         this.formStatus = 'create'
       },
       handleDelete() {
@@ -226,9 +270,9 @@
           type: 'warning'
         }).then(() => {
           delObj(this.currentId).then(() => {
-            this.getList()
-            this.resetForm()
-            this.onCancel()
+            this.getList();
+            this.resetForm();
+            this.onCancel();
             this.$notify({
               title: '成功',
               message: '删除成功',
@@ -240,30 +284,30 @@
       },
       update() {
         putObj(this.form).then(() => {
-          this.getList()
+          this.getList();
           this.$notify({
             title: '成功',
             message: '更新成功',
             type: 'success',
             duration: 2000
-          })
+          });
           this.formEdit = true
         })
       },
       create() {
         addObj(this.form).then(() => {
-          this.getList()
+          this.getList();
           this.$notify({
             title: '成功',
             message: '创建成功',
             type: 'success',
             duration: 2000
-          })
+          });
           this.formEdit = true
         })
       },
       onCancel() {
-        this.formEdit = true
+        this.formEdit = true;
         this.formStatus = ''
       },
       resetForm() {
