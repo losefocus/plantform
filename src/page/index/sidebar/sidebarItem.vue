@@ -44,6 +44,7 @@ export default {
       return path == null ? index + "" : path;
     },
     open(item) {
+      console.log(item.path)
       this.$router.push({
         path: resolveUrlPath(item.path, item.name),
         query: item.query
