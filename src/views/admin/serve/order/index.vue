@@ -5,9 +5,9 @@
                 <div class="t_l clearfix">
                     <span class="pull-left">产品服务</span>
                     <div class="pull-left" style="width:120px;margin-left:10px;" >
-                        <el-select size="small" v-model="product" placeholder="请选择">
+                        <el-select size="small" v-model="listQuery.service_id" placeholder="请选择" @change="handleChange">
                             <el-option
-                            v-for="item in productOptions"
+                            v-for="item in serviceOptions"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value">
@@ -19,9 +19,9 @@
                 <div class="t_l clearfix">
                     <span class="pull-left">支付状态</span>
                     <div class="pull-left" style="width:120px;margin-left:10px;">
-                    <el-select  size="small" v-model="type" placeholder="请选择">
+                    <el-select  size="small" v-model="listQuery.status" placeholder="请选择" @change="handleChange">
                         <el-option
-                        v-for="item in typeOptions"
+                        v-for="item in statusOptions"
                         :key="item.value"
                         :label="item.label"
                         :value="item.value">
@@ -38,14 +38,15 @@
                         type="daterange"
                         range-separator="至"
                         start-placeholder="开始日期"
-                        end-placeholder="结束日期">
+                        end-placeholder="结束日期"
+                        @change="changeTime">
                         </el-date-picker>
                     </div>
                 </div>
                 <div class="t_l" style="width:100px;">
-                    <el-select v-model="filterKey" placeholder="请选择" size="small">
+                    <el-select v-model="filterKey" placeholder="请选择" size="small" @change="changeKey">
                         <el-option label="订单号" value="order_no"> </el-option>
-                        <el-option label="用户名" value="buyer_name"> </el-option>
+                        <el-option label="用户名" value="username"> </el-option>
                     </el-select>
                 </div>
                 <div class="t_l"  style="width:120px;margin-left:-15px">
@@ -60,7 +61,7 @@
                         :data="list"
                         style="width: 100%">
                         <el-table-column
-                            prop="buyerName"
+                            prop="username"
                             label="用户名称"
                             width="120">
                         </el-table-column>
@@ -78,6 +79,9 @@
                             prop="payMethod"
                             align="center"
                             label="支付方式">
+                            <template slot-scope="scope">
+                                <span>{{payMethodMap.get(scope.row.payMethod+'')}}</span>
+                            </template>
                         </el-table-column>
                         <el-table-column
                             prop="payMoney"
@@ -109,6 +113,9 @@
                             prop="status"
                             align="center"
                             label="状态">
+                            <template slot-scope="scope">
+                                <span>{{statusMap.get(scope.row.status+'')}}</span>
+                            </template>
                         </el-table-column>
                     </el-table>
                     <div style="margin-top:20px;" class="clearfix">
@@ -124,39 +131,81 @@
 </template>
 
 <script>
-import { fetchList} from "@/api/serve/order";
+import { fetchList,serviceList} from "@/api/serve/order";
+import {remote} from "@/api/dict";  
 
 export default {
     data(){
         return {
-            product:'',
-            productOptions:[{value:'1',label:'所有产品'}],
+            serviceOptions:[],
             type:'',
-            typeOptions:[{value:'1',label:'所有状态'}],
+            statusOptions:[],
             time:[],
-            list:[{name:'12s',money:'123'}],
+            list:[],
             listQuery:{
                 page_index:1,
-                page_size:20
+                page_size:20,
+                sort_by:'o.created_at',
+                direction:'desc',
             },
             total:0,
             filterKey:'order_no',
-            filterVal:''
+            filterVal:'',
+            statusMap:null,
+            payMethodMap:null,
         }
     },
     computed: {
         
     },
     created() {
+        remote("order_status").then(res => {
+            [...this.statusOptions] = res.data.result
+            this.statusOptions.unshift({value:'',label:'所有状态'})
+            this.statusMap = new Map()
+            res.data.result.forEach(ele => {
+                this.statusMap.set(ele.value,ele.label)
+            });
+        });
+        remote("pay_method").then(res => {
+            this.payMethodMap = new Map()
+            res.data.result.forEach(ele => {
+                this.payMethodMap.set(ele.value,ele.label)
+            });
+        });
+        this.getServiceList()
+    },
+    mounted(){
         this.getList()
     },
     methods:{
-        filterKeyword(){
-            this.listQuery={
+        getServiceList(){
+            let data ={
                 page_index:1,
-                page_size:20
-            },
+                page_size:99
+            }
+            serviceList(data).then(res => {
+                this.serviceOptions = res.data.result.items.map(v => {return {value:v.id,label:v.name}})
+                this.serviceOptions.unshift({value:'',label:'所有状态'})
+            })
+        },
+        changeKey(){
+            delete this.listQuery.order_no
+            delete this.listQuery.username
+        },
+        filterKeyword(){
+            this.listQuery.page_index = 1
             this.listQuery[this.filterKey] = this.filterVal
+            this.getList();
+        },
+        changeTime(val){
+            this.listQuery.page_index = 1;
+            this.listQuery.date_start = new Date(val[0]).getTime()/1000
+            this.listQuery.date_end = new Date(val[1]).getTime()/1000
+            this.getList()
+        },
+        handleChange(){
+            this.listQuery.page_index = 1;
             this.getList();
         },
         handleSizeChange(val) {

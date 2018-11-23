@@ -1,55 +1,60 @@
 <template>
     <div class="app-container">
         <el-button type="primary" size="small" @click="handleClick">新增</el-button>
-        <el-table
-            :data="list"
-            style="width: 100%;margin-top:20px;">
-            <el-table-column
-                prop="name"
-                label="名称">
-            </el-table-column>
-            <el-table-column
-                prop="type"
-                label="类型">
-            </el-table-column>
-            <el-table-column
-                prop="price"
-                label="单价"
-                width ="100">
-            </el-table-column>
-            <el-table-column
-                prop="unit"
-                label="单位"
-                width ="100">
-            </el-table-column>
-            <el-table-column
-                prop="discount"
-                label="折扣"
-                width ="100">
-            </el-table-column>
-            <el-table-column
-                prop="intro"
-                label="简介"
-                show-overflow-tooltip>
-            </el-table-column>
-            <el-table-column
-                prop="comment"
-                label="备注"
-                show-overflow-tooltip>
-            </el-table-column>
-            <el-table-column
-                prop="address"
-                label="操作"
-                width ="150">
-                <template slot-scope="scope" >
-                    <el-button size="mini" type="" plain @click="handleupdate(scope.row)">修改</el-button>
-                    <el-button size="mini" type="" plain @click="deleteServe(scope.row)" style="margin-left:0px">删除</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-        <el-pagination style="margin-top:20px;float:right" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="listQuery.page_index" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" layout="total, prev, pager, next, jumper" :total="total">
-        </el-pagination>
-        <el-dialog title="新增服务"  :visible.sync="addVisible" width='690px' >
+        <div v-loading="loading">
+            <el-table
+                :data="list"
+                style="width: 100%;margin-top:20px;">
+                <el-table-column
+                    prop="name"
+                    label="名称">
+                </el-table-column>
+                <el-table-column
+                    prop="type"
+                    label="类型">
+                    <template slot-scope="scope">
+                        <span>{{typeMap.get(scope.row.type.toString())}}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                    prop="price"
+                    label="单价"
+                    width ="100">
+                </el-table-column>
+                <el-table-column
+                    prop="unit"
+                    label="单位"
+                    width ="100">
+                </el-table-column>
+                <el-table-column
+                    prop="discount"
+                    label="折扣"
+                    width ="100">
+                </el-table-column>
+                <el-table-column
+                    prop="intro"
+                    label="简介"
+                    show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column
+                    prop="comment"
+                    label="备注"
+                    show-overflow-tooltip>
+                </el-table-column>
+                <el-table-column
+                    prop="address"
+                    label="操作"
+                    width ="150">
+                    <template slot-scope="scope" >
+                        <el-button size="mini" type="" plain @click="handleupdate(scope.row)">修改</el-button>
+                        <el-button size="mini" type="" plain @click="deleteServe(scope.row)" style="margin-left:0px">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination style="margin-top:20px;float:right" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="listQuery.page_index" :page-sizes="[10,20,30, 50]" :page-size="listQuery.page_size" layout="total, prev, pager, next, jumper" :total="total">
+            </el-pagination>
+        </div>
+        <el-dialog title="新增服务"  :visible.sync="addVisible" width='690px' @close="closed">
             <div class="clearfix">
                 <div class="clearfix" style="width:600px;margin:-20px auto 0">
                     <el-form :model="form" label-width="50px" size="small">
@@ -57,25 +62,49 @@
                             <el-input v-model="form.name"></el-input>
                         </el-form-item>
                         <el-form-item label="类型" style="float:left;margin-right:20px;">
-                            <el-input v-model="form.type" style="width:240px;"></el-input>
+                            <!-- <el-input v-model="form.type" style="width:240px;"></el-input> -->
+                            <div style="width:240px;">
+                                <el-select size="small" v-model="form.type" placeholder="请选择类型">
+                                    <el-option
+                                    v-for="item in typeOptions"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </div>
                         </el-form-item>
                         <el-form-item label="单位" style="float:left;">
                             <el-input v-model="form.unit" style="width:240px;"></el-input>
                         </el-form-item>
                         <el-form-item label="单价" style="float:left;margin-right:20px;">
-                            <el-input v-model="form.price" style="width:240px;"></el-input>
+                            <el-input v-model="form.price" type="number" style="width:220px;margin-right:5px"></el-input>元
                         </el-form-item>
                         <el-form-item label="折扣" style="float:left;">
-                            <el-input v-model="form.discount" style="width:240px;"></el-input>
+                            <el-input v-model="form.discount" type="number" style="width:220px;margin-right:5px"></el-input>%
                         </el-form-item>
                         <el-form-item label="简介" style="float:left;">
-                            <el-input v-model="form.intro"></el-input>
+                            <el-input type="textarea" v-model="form.intro" style="width:550px;"></el-input>
                         </el-form-item>
-                        <el-form-item label="图片" style="float:left;width:500px">
-                            <el-input v-model="form.thumbnailUrl"></el-input>
+                        <el-form-item label="图片" style="float:left;">
+                            <el-upload
+                            v-loading='uploadLoaing'
+                            class="avatar-uploader"
+                            ref="upload"
+                            action="/tenant/attachment/upload"
+                            :limit="999"
+                            :data="params"
+                            name="uploadFile"
+                            :show-file-list ="false"
+                            :before-upload='beforeUpload'
+                            :on-success="uploadSuccess"
+                            :auto-upload="true">
+                                <img v-if="form.thumbnailUrl!='' && form.thumbnailUrl!=undefined" :src="form.thumbnailUrl+form.thumbnailPath" class="avatar">
+                                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                            </el-upload>
                         </el-form-item>
                         <el-form-item label="备注" style="float:left;">
-                            <el-input v-model="form.comment"></el-input>
+                            <el-input v-model="form.comment" style="width:550px;"></el-input>
                         </el-form-item>
                     </el-form>
                 </div>
@@ -92,7 +121,8 @@
 
 <script>
 import { addObj,fetchList,updateObj,deleteObj} from "@/api/serve/myserve";
-
+import { getToken } from "@/util/auth";
+import {remote} from "@/api/dict";
 export default {
     components:{
         
@@ -100,6 +130,12 @@ export default {
     data(){
         return {
             list:[],
+            listQuery: {
+                page_index: 1,
+                page_size: 20,
+            },
+            total:0,
+            loading:false,
             flag:'add',
             addVisible:false,
             form:{
@@ -114,23 +150,28 @@ export default {
                 comment:'',
                 status:1,
             },
-            listQuery: {
-                page_index: 1,
-                page_size: 20
-            },
-            total:0,
-            loading:false,
+            typeOptions:[],
+            params:{component :'service'},
             btnLoading:false,
+            uploadLoaing:false,
+            typeMap:null,
         }
     },
     computed: {
         
     },
     created() {
-        this.getList()
+        remote("service_type").then(res => {
+            this.typeOptions = res.data.result
+            this.typeMap = new Map()
+            res.data.result.forEach(ele => {
+                this.typeMap.set(ele.value,ele.label)
+            });
+        });
+        
     },
     mounted(){
-        
+        this.getList()
     },
     destroyed(){
 
@@ -142,7 +183,7 @@ export default {
         addServe(){
             this.flag = 'add'
             let data = this.form
-            data.discount = parseFloat(data.discount)
+            data.discount = parseFloat(data.discount)/100
             data.price = parseFloat(data.price)
             this.btnLoading = true
             addObj(data).then(res => {
@@ -180,10 +221,13 @@ export default {
             this.flag = 'edit'
             this.addVisible = true
             this.form = Object.assign({},row)
+            this.form.discount = parseInt(row.discount*100)
         },
         updateServe(){
             this.btnLoading = true
-            updateObj(this.form).then(res => {
+            let data = Object.assign({},this.form)
+            data.discount = parseFloat(data.discount)/100
+            updateObj(data).then(res => {
                 if(res.data.success){
                     this.$notify({
                         title: '成功',
@@ -197,6 +241,23 @@ export default {
                 }
                 this.btnLoading = false
             })
+        },
+        beforeUpload(){
+            this.uploadLoaing = true
+        },
+        uploadSuccess(response, file, fileList){
+            if(response.success == false){
+                this.$notify.error({
+                    title: '错误',
+                    message: '图片获取失败'
+                });
+            }else{
+                this.form.thumbnailPath = response.result.path
+                this.form.thumbnailUrl = response.result.baseUrl
+
+            }
+            this.uploadLoaing = false
+            
         },
         deleteServe(row){
             deleteObj(row.id).then(res => {
@@ -219,6 +280,21 @@ export default {
                 }
             })   
         },
+        closed(){
+            this.form={
+                name:'',
+                type:'',
+                unit:'',
+                price:'',
+                discount:'',
+                intro:'',
+                thumbnailUrl:'',
+                thumbnailPath:'',
+                comment:'',
+                status:1,
+            }
+            this.btnLoading = false
+        }
     },
     watch:{
 
@@ -226,6 +302,35 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.avatar-uploader{
+     height: 110px;
+}
+.avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 203px;
+    height: 110px;
+    line-height: 110px;
+    text-align: center;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+  }
+  .avatar {
+    width: 203px;
+    height: 110px;
+    display: block;
+    border-radius: 4px;
+  }
     .serverList{
         display: flex;
         flex-wrap:wrap;

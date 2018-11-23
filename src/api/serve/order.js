@@ -8,3 +8,13 @@ export function fetchList(query) {
     params: query
   })
 }
+
+
+/* 列表 */
+export function serviceList(query) {
+  return request({
+    url: '/tenant/order/service/list',
+    method: 'get',
+    params: query
+  })
+}

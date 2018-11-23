@@ -119,7 +119,9 @@ export default {
             list:[{name:'12s',money:'123'}],
             listQuery:{
                 page_index:1,
-                page_size:20
+                page_size:20,
+                sort_by:'ob.created_at',
+                direction:'desc',
             },
             total:0,
         }
