@@ -31,6 +31,7 @@
             <el-form-item label="父级节点" prop="parentId">
               <!--<el-input v-model="form.parentId" :disabled="formEdit" placeholder="请输入父级节点"></el-input>-->
               <el-cascader
+                :disabled="formEdit"
                 :options="treeData"
                 :props="props"
                 change-on-select
@@ -324,6 +325,7 @@
           method: undefined,
           path: undefined
         }
+        this.selectedOptions = []
       }
     }
   }
