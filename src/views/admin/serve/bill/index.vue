@@ -5,9 +5,9 @@
                 <div class="t_l clearfix">
                     <span class="pull-left">发票类型</span>
                     <div class="pull-left" style="width:120px;margin-left:10px;" >
-                        <el-select size="small" v-model="product" placeholder="请选择">
+                        <el-select size="small" v-model="listQuery.bill_type" placeholder="请选择" @change="handleChange">
                             <el-option
-                            v-for="item in productOptions"
+                            v-for="item in typeOptions"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value">
@@ -18,9 +18,9 @@
                 <div class="t_l clearfix">
                     <span class="pull-left">开票状态</span>
                     <div class="pull-left" style="width:120px;margin-left:10px;" >
-                        <el-select size="small" v-model="product" placeholder="请选择">
+                        <el-select size="small" v-model="listQuery.status" placeholder="请选择" @change="handleChange">
                             <el-option
-                            v-for="item in productOptions"
+                            v-for="item in statusOptions"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value">
@@ -37,23 +37,25 @@
                         type="daterange"
                         range-separator="至"
                         start-placeholder="开始日期"
-                        end-placeholder="结束日期">
+                        end-placeholder="结束日期"
+                        unlink-panels
+                        @change="changeTime">
                         </el-date-picker>
                     </div>
                 </div>
                 <div class="t_l"  style="width:120px;">
-                    <el-input v-model="listQuery.name" size="small" placeholder="用户名称"></el-input>
+                    <el-input v-model="listQuery.username" size="small" placeholder="用户名称" @blur="handleChange"></el-input>
                 </div>
                 <div class="t_l" style="margin-right:0px">
-                    <el-button size="small" @click="filterKeyword">查询</el-button>
+                    <el-button size="small" @click="handleChange">查询</el-button>
                 </div>
             </div>
-            <div class="c_b">
+            <div class="c_b" v-loading="loading">
                     <el-table
                         :data="list"
                         style="width: 100%">
                         <el-table-column
-                            prop="name"
+                            prop="username"
                             label="用户名称"
                             width="120">
                         </el-table-column>
@@ -80,17 +82,31 @@
                             prop="billType"
                             align="center"
                             label="发票类型">
+                            <template slot-scope="scope">
+                                <span>{{typeMap.get(scope.row.billType.toString())}}</span>
+                            </template>
                         </el-table-column>
                         <el-table-column
                             prop="status"
                             align="center"
-                            label="开票状态">
+                            label="开票状态">statusMap
+                            <template slot-scope="scope">
+                                <span>{{statusMap[scope.row.status.toString()]}}</span>
+                            </template>
                         </el-table-column>
                         <el-table-column
                             prop="comment"
                             align="center"
                             label="备注"
                             show-overflow-tooltip>
+                        </el-table-column>
+                        <el-table-column
+                            prop=""
+                            align="center"
+                            label="操作">
+                            <template slot-scope="scope">
+                                <el-button v-if="scope.row.status == 0" plain size="mini" @click="updateBill(scope.row)">开票</el-button>
+                            </template>
                         </el-table-column>
                     </el-table>
                     <div style="margin-top:20px;" class="clearfix">
@@ -106,17 +122,15 @@
 </template>
 
 <script>
-import { fetchList} from "@/api/serve/bill";
-
+import { fetchList,updateObj} from "@/api/serve/bill";
+import {remote} from "@/api/dict";
 export default {
     data(){
         return {
-            product:'',
-            productOptions:[{value:'1',label:'所有产品'}],
-            type:'',
-            typeOptions:[{value:'1',label:'所有状态'}],
+            statusOptions:[{value:'',label:'所有状态'},{value:'0',label:'未开票'},{value:'1',label:'已开票'},{value:'2',label:'已邮寄'},],
+            typeOptions:[],
             time:[],
-            list:[{name:'12s',money:'123'}],
+            list:[],
             listQuery:{
                 page_index:1,
                 page_size:20,
@@ -124,15 +138,42 @@ export default {
                 direction:'desc',
             },
             total:0,
+            loading:false,
+            typeMap:null,
+            statusMap:{
+                '0':'未开票',
+                '1':'已开票',
+                '2':'已邮寄',
+            }
         }
     },
     computed: {
         
     },
     created() {
+        remote("bill_type").then(res => {
+            this.typeOptions = res.data.result
+            this.typeOptions.unshift({value:'',label:'所有类型'})
+            this.typeMap = new Map()
+            res.data.result.forEach(ele => {
+                this.typeMap.set(ele.value,ele.label)
+            });
+        });
+    },
+     mounted(){
         this.getList()
     },
     methods:{
+        changeTime(val){
+            this.listQuery.page_index = 1;
+            this.listQuery.date_start = new Date(val[0]).getTime()/1000
+            this.listQuery.date_end = new Date(val[1]).getTime()/1000
+            this.getList()
+        },
+        handleChange(){
+            this.listQuery.page_index=1
+            this.getList();
+        },
         filterKeyword(){
             this.listQuery.page_index=1
             this.getList();
@@ -146,9 +187,27 @@ export default {
             this.getList();
         },
         getList(){
+            this.loading = true
             fetchList(this.listQuery).then(res => {
                 this.list = res.data.result.items
                 this.total = res.data.result.total
+                this.loading = false
+            })
+        },
+        updateBill(row){
+            let data ={id:row.id,status:1}
+            updateObj(data).then(res => {
+                if(res.data.success){
+                    this.$notify({
+                        title: '成功',
+                        message: "操作成功",
+                        type: "success",
+                        duration: 2000
+                    });
+                    this.listQuery.page_index=1
+                    this.getList()
+                }
+                
             })
         }
     }

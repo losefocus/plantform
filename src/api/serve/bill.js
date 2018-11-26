@@ -8,3 +8,12 @@ export function fetchList(query) {
     params: query
   })
 }
+
+/* 列表 */
+export function updateObj(query) {
+  return request({
+    url: '/tenant/order/billHistory/update',
+    method: 'post',
+    data: query
+  })
+}

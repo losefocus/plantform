@@ -39,6 +39,7 @@
                         range-separator="至"
                         start-placeholder="开始日期"
                         end-placeholder="结束日期"
+                        unlink-panels
                         @change="changeTime">
                         </el-date-picker>
                     </div>
@@ -56,7 +57,7 @@
                     <el-button size="small" @click="filterKeyword">查询</el-button>
                 </div>
             </div>
-            <div class="c_b">
+            <div class="c_b" v-loading="loading">
                     <el-table
                         :data="list"
                         style="width: 100%">
@@ -153,6 +154,7 @@ export default {
             filterVal:'',
             statusMap:null,
             payMethodMap:null,
+            loading:false,
         }
     },
     computed: {
@@ -217,9 +219,11 @@ export default {
             this.getList();
         },
         getList(){
+            this.loading = true
             fetchList(this.listQuery).then(res => {
                 this.list = res.data.result.items
                 this.total = res.data.result.total
+                this.loading = false
             })
         }
     }

@@ -26,7 +26,7 @@
       </el-table-column>
       <el-table-column align="center" label="code" show-overflow-tooltip enterable>
         <template slot-scope="scope">
-          <span>{{scope.row.code}}</span>
+          <span style="cursor: pointer;" class="copy_key" :data-clipboard-text="scope.row.code" @click="copy()">{{scope.row.code}}</span>
         </template>
       </el-table-column>
       <el-table-column align="center" label="电话">
@@ -87,7 +87,7 @@
           <el-input v-model="form.position" placeholder="请输入地址"></el-input>
         </el-form-item>
         <el-form-item label="说明" prop="comment">
-          <el-input v-model="form.comment" placeholder="请输入说明"></el-input>
+          <el-input v-model="form.comment" type="textarea" placeholder="请输入说明"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -103,11 +103,10 @@
   import {fetchList, getObj, addObj, putObj, delObj} from "@/api/tenant";
   import {treeAddValue} from "@/util/util";
   import waves from "@/directive/waves/index.js"; // 水波纹指令
-  // import { parseTime } from '@/utils'
   import {mapGetters} from "vuex";
   import ElRadioGroup from "element-ui/packages/radio/src/radio-group";
   import ElOption from "element-ui/packages/select/src/option";
-
+let Base64 = require('js-base64').Base64;
   export default {
     components: {
       ElOption,
@@ -208,7 +207,7 @@
           9: "锁定"
         };
         return statusMap[status];
-      }
+      },
     },
     created() {
       this.getList();
@@ -226,6 +225,9 @@
         this.listQuery.direction = false;
         fetchList(this.listQuery).then(response => {
           this.list = response.data.result.items;
+          this.list.forEach(res => {
+            res.comment = Base64.decode(res.comment)
+          })
           this.total = response.data.result.total;
           this.listLoading = false;
         });
@@ -290,7 +292,27 @@
           contact: "",
           code: ""
         };
-      }
+      },
+      copy() {  
+            var clipboard = new this.Clipboard('.copy_key');  
+            clipboard.on('success', e => {  
+                this.$message({
+                    message: '复制成功',
+                    type: 'success'
+                });
+                    // 释放内存  
+                clipboard.destroy()  
+            })  
+            clipboard.on('error', e => {  
+                // 不支持复制  
+                this.$message({
+                    message: '该浏览器不支持自动复制',
+                    type: 'warning'
+                });
+                // 释放内存  
+                clipboard.destroy()  
+            })  
+        },
     }
   };
 </script>
