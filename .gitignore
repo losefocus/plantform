@@ -1,6 +1,7 @@
 .DS_Store
 node_modules/
 dist/
+.history/
 static/ueditor/
 npm-debug.log*
 yarn-debug.log*
