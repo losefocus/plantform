@@ -86,7 +86,7 @@
           <el-input type="password" v-model="form.password"></el-input>
         </el-form-item>
 
-         <el-form-item label="所属部门" prop="deptName">
+         <el-form-item label="所属部门" prop="deptId">
           <!-- <el-input v-model="form.deptName" placeholder="选择部门" readonly></el-input> -->
           <!-- <input type="hidden" v-model="form.deptId" /> -->
           <el-cascader
@@ -196,7 +196,7 @@ export default {
             trigger: "blur"
           }
         ],
-        deptName:[
+        deptId:[
           {
             required: true,
             message: "请选择部门",
